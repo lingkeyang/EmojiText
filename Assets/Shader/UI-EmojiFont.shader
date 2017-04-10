@@ -82,7 +82,7 @@ Shader "UI/EmojiFont" {
 			v2f vert(appdata_t IN)
 			{
 				v2f OUT;
-				OUT.vertex = UnityObjectToClipPos(IN.vertex);
+				OUT.vertex = mul(UNITY_MATRIX_MVP, float4(IN.vertex.x, IN.vertex.y, IN.vertex.z, 1.0));
 
 				OUT.texcoord = IN.texcoord;
 				OUT.texcoord1 = IN.texcoord1;
@@ -111,9 +111,10 @@ Shader "UI/EmojiFont" {
 					fixed4 data = tex2D(_EmojiDataTex, uv);
 						
 					half frameCount = 1 + sign(data.r) + sign(data.g) * 2 + sign(data.b) * 4;
-					half index = floor(fmod(_Time.x * _FrameSpeed * 50, frameCount));
+					half index = abs(fmod(floor(_Time.x * _FrameSpeed * 50), frameCount));
 
-					half flag = (1 + sign(IN.texcoord1.x + index * size - 1)) / 2;
+					half factor2 = 2;
+					half flag = (1 + sign(IN.texcoord1.x + index * size - 1)) / factor2;
 					IN.texcoord1.x += index * size - flag;
 					IN.texcoord1.y += size * flag;
 
